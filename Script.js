@@ -77,8 +77,11 @@ const updatePlayerUI = () => {
 const newTurn = () =>{
 	initHand().then(() => {		
 		console.log("Player: " + gameState.activePlayer + " Points: " + gameState.players[gameState.activePlayer].Points);
-		if(gameState.players[gameState.activePlayer].Points == 22){
+		if(gameState.players[gameState.activePlayer].Points == 22 || (gameState.isSinglePlayer && gameState.players[1].Points > gameState.players[0].Points)){
 			gameOver();
+		}
+		else if(gameState.isSinglePlayer && gameState.activePlayer == 1 && gameState.players[1].Points < 20){
+			hit();
 		}
 		/*else{
 			//todo: UI changes for the next player
@@ -96,48 +99,22 @@ const hit = () =>{
 		if(gameState.players[gameState.activePlayer].Points > 21){
 			gameState.players[gameState.activePlayer].Alive = false;
 			pass();
-		}	
+		}
+		else if (gameState.isSinglePlayer && gameState.activePlayer == 1){
+			if(gameState.players[0].Points >= gameState.players[1].Points && gameState.players[1].Points < 20){
+				setTimeout(hit, 1000);
+			}
+			else pass();
+		}
 	});
 }
 
 const pass = () => {
-	if (gameState.players[gameState.activePlayer].Alive == true && gameState.isSinglePlayer) makeBotTurn();
-	else if(gameState.activePlayer < gameState.players.length - 1 && !gameState.isSinglePlayer){
+	if(gameState.activePlayer < gameState.players.length - 1 && !(gameState.isSinglePlayer && gameState.players[0].Alive == false)){
 		gameState.activePlayer += 1;
 		newTurn();
 	}
 	else gameOver();
-}
-
-const makeBotTurn = () => {
-	gameState.activePlayer = 1;
-	initHand().then(() => {		
-		console.log("Bot Points: " + gameState.players[1].Points);
-		if(gameState.players[1].Points == 22 || gameState.players[1].Points > gameState.players[0].Points){
-			gameOver();
-		}
-		else{
-			botHit();
-		}
-	});		
-}
-
-const botHit = () =>{
-	getCard(1).then(cards => {
-		console.log("Bot drew card: " + cards[0].value + " of " + cards[0].suit);
-		gameState.players[1].Points += returnCardValue(cards[0].value);
-		gameState.players[1].Cards.push(cards[0]);		
-		console.log("Bot points: " + gameState.players[gameState.activePlayer].Points);
-		updatePlayerUI();
-		if(gameState.players[0].Points >= gameState.players[1].Points && gameState.players[1].Points < 20){
-			setTimeout(botHit, 1000);
-		}
-		else if(gameState.players[1].Points > 21){
-			gameState.players[1].Alive = false;
-			pass();		
-		}
-		else pass();
-	});
 }
 
 const gameOver = () => {
