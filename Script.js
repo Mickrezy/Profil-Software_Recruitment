@@ -1,43 +1,68 @@
-async function initGame(playerCount){
-	let activePlayer = 0;
-	const playerArray = [];
-	let deck = await initDeck();
-	for (i = 0; i < playerCount; i++){
-		let player = {Cards: [], Points: 0, Alive: true};
-		playerArray.push(player);
-	}
-	newTurn(activePlayer, playerArray, deck);
-}
+const gameState = {
+	deckID: null,
+	players: [],
+	isSinglePlayer: false,
+	isGameInitializing: false,
+	isGameInitialized: false,
+	activePlayer: null,
+	initialCards: null,
+};
 
-async function getData(url) {
-    const response = await fetch(url);
-    return response.json()
-}
+const getData = url => fetch(url).then(res => res.json()).catch(err => err);
 
-async function initDeck(){
+const initDeck = () => {
 	let url = 'https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1';
-	const data = await getData(url);
-	console.log("Deck id: " + data.deck_id);
-	return data.deck_id;
+	return getData(url).then(data => {
+		gameState.deckID = data.deck_id;	
+		console.log("DeckID: " + gameState.deckID);		
+	});
 }
 
-async function initHand(player, deck, index){
-	for(i = 0; i < 2; i++){
-		const card = await getCard(deck);
-		player.Points += returnCardValue(card.value);		
-		player.Cards.push(card);
-		updatePlayerUI(index, card);		
-	}	
+const initGame = playerCount => {
+  gameState.isGameInitializing = true;
+  for (i = 0; i < playerCount; i++){
+    gameState.players.push({
+      Cards: [],
+      Points: 0, 
+      Alive: true
+    });
+  }
+  if(playerCount == 1){
+	gameState.isSinglePlayer = true;
+	gameState.players.push({
+      Cards: [],
+      Points: 0, 
+      Alive: true
+    });
+  }
+  initDeck().then(() => {
+    gameState.isGameInitializing = false;
+    gameState.isGameInitialized = true;
+    startGame();
+  });
 }
 
-async function getCard(deck){
-	let url = 'https://deckofcardsapi.com/api/deck/' + deck + '/draw/?count=1';
-	const card = await getData(url);
-	console.log("Added " + card.cards[0].value + " of " + card.cards[0].suit); 
-	return card.cards[0];
+const startGame = () => {
+  gameState.activePlayer = 0;
+  gameState.initialCards = 2;
+  newTurn();
 }
 
-function returnCardValue(card){
+const initHand = () => {
+	return getCard(gameState.initialCards).then(cards => {
+		for(i = 0; i < gameState.initialCards; i++){
+			console.log("Card: " + cards[i].value + " of " + cards[i].suit);
+			gameState.players[gameState.activePlayer].Points += returnCardValue(cards[i].value);		
+			gameState.players[gameState.activePlayer].Cards.push(cards[i]);		
+		}}).then(()=> updatePlayerUI());	
+}
+
+const getCard = cardNum => {
+	let url = 'https://deckofcardsapi.com/api/deck/' + gameState.deckID + '/draw/?count=' + cardNum;
+	return getData(url).then(data => data.cards);
+}
+
+const returnCardValue = card => {
 	if (card=="ACE") return 11;
 	else if (card=="JACK" || card=="2") return 2;
 	else if (card=="QUEEN" || card=="3") return 3;
@@ -45,58 +70,109 @@ function returnCardValue(card){
 	else return parseInt(card);
 }
 
-function updatePlayerUI(index, card){
+const updatePlayerUI = () => {
 	//todo: putting cards on the table and updating player points
 }
 
-async function hit(activePlayer, playerArray, deck){
-	const card = await getCard(deck);
-	playerArray[activePlayer].Points += returnCardValue(card.value);
-	playerArray[activePlayer].Cards.push(card);		
-	updatePlayerUI(activePlayer, card);
-	if(playerArray[activePlayer].Points > 21){
-		playerArray[activePlayer].Alive = false;
-		pass(activePlayer, playerArray, deck);
+const newTurn = () =>{
+	initHand().then(() => {		
+		console.log("Player: " + gameState.activePlayer + " Points: " + gameState.players[gameState.activePlayer].Points);
+		if(gameState.players[gameState.activePlayer].Points == 22){
+			gameOver();
+		}
+		/*else{
+			//todo: UI changes for the next player
+		}*/
+	});				
+}
+
+const hit = () =>{
+	getCard(1).then(cards => {
+		console.log("Player: " + gameState.activePlayer + " drew card: " + cards[0].value + " of " + cards[0].suit);
+		gameState.players[gameState.activePlayer].Points += returnCardValue(cards[0].value);
+		gameState.players[gameState.activePlayer].Cards.push(cards[0]);	
+		console.log("Player: " + gameState.activePlayer + " Points: " + gameState.players[gameState.activePlayer].Points);		
+		updatePlayerUI();
+		if(gameState.players[gameState.activePlayer].Points > 21){
+			gameState.players[gameState.activePlayer].Alive = false;
+			pass();
+		}	
+	});
+}
+
+const pass = () => {
+	if (gameState.players[gameState.activePlayer].Alive == true && gameState.isSinglePlayer) makeBotTurn();
+	else if(gameState.activePlayer < gameState.players.length - 1 && !gameState.isSinglePlayer){
+		gameState.activePlayer += 1;
+		newTurn();
 	}
+	else gameOver();
 }
 
-function pass(activePlayer, playerArray, deck){
-	if(activePlayer < playerArray.length - 1) newTurn(activePlayer + 1, playerArray, deck);
-	else gameOver(playerArray);
+const makeBotTurn = () => {
+	gameState.activePlayer = 1;
+	initHand().then(() => {		
+		console.log("Bot Points: " + gameState.players[1].Points);
+		if(gameState.players[1].Points == 22 || gameState.players[1].Points > gameState.players[0].Points){
+			gameOver();
+		}
+		else{
+			botHit();
+		}
+	});		
 }
 
-async function newTurn(activePlayer, playerArray, deck){
-	await initHand(playerArray[activePlayer], deck, activePlayer);
-	console.log("Player: " + activePlayer + " Points: " + playerArray[activePlayer].Points);
-	if(playerArray[activePlayer].Points == 22){
-		gameOver(playerArray);
-	}
-	else{
-		//todo: UI changing for the next player
-		//document.getElementById("hitButton").addEventListener("click", hit(activePlayer, playerArray, deck));
-		//document.getElementById("passButton").addEventListener("click", pass(activePlayer, playerArray, deck));
-	}				
+const botHit = () =>{
+	getCard(1).then(cards => {
+		console.log("Bot drew card: " + cards[0].value + " of " + cards[0].suit);
+		gameState.players[1].Points += returnCardValue(cards[0].value);
+		gameState.players[1].Cards.push(cards[0]);		
+		console.log("Bot points: " + gameState.players[gameState.activePlayer].Points);
+		updatePlayerUI();
+		if(gameState.players[0].Points >= gameState.players[1].Points && gameState.players[1].Points < 20){
+			setTimeout(botHit, 1000);
+		}
+		else if(gameState.players[1].Points > 21){
+			gameState.players[1].Alive = false;
+			pass();		
+		}
+		else pass();
+	});
 }
 
-function gameOver(playerArray){
-	const winners = [];
+const gameOver = () => {
+	let winners = [];
 	let bestScore = 0;
-	for(i = 0; i < playerArray.length; i++){
-		if (playerArray[i].Alive == true){
-			if(playerArray[i] > bestScore){
+	for(i = 0; i < gameState.players.length; i++){
+		if (gameState.players[i].Alive == true){
+			if(gameState.players[i].Points > bestScore){
 				winners = [];
 				winners.push(i);
+				bestScore = gameState.players[i].Points;
 			}
-			else if (playerArray[i] == bestScore){
+			else if (gameState.players[i].Points == bestScore){
 				winners.push(i);
 			}
 		}			
 	}
+	let msg = "";
+	for(i = 0; i < winners.length; i++){
+		msg += "Player " + winners[i] + " ";
+	}
+	msg += "won!"
+	console.log(msg);
 	//todo: window for scores and "play again" function
 }
 
-function restartGame(){
+const restartGame = () =>{
 	//game reset
+	gameState.deckID = null;
+	gameState.players = [];
+	gameState.isGameInitializing = false;
+	gameState.isGameInitialized = false;
+	gameState.isSinglePlayer = false;
+	gameState.activePlayer = 0;
+	gameState.initialCards = 2;
 }
 
 
