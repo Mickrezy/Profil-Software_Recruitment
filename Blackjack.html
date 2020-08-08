@@ -1,14 +1,42 @@
 <!DOCTYPE html>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="Style.css">
-<script src="Script.js"></script> 
 <html>
-<body>
-	<div>
-		<input type="button" id="btnStart" class="btn" value="start" onclick="initGame(1)"></br>
-		<input type="button" id="hitButton" class="btn" value="hit" onclick="hit()"></>
-		<input type="button" id="passButton" class="btn" value="pass" onclick="pass()"></>
-	</div>
-	<div id="demo">demo</div>
-</body>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="Style.css">
+		<script src="Script.js"></script> 
+	</head>
+	<body>
+		<div id="main-window">
+			<h3>Blackjack</h3>
+			<div id="start-window">
+				<input type="button" id="btnSingle" class="btn" value="Single player" onclick="initGame(1)"></br>
+				<input type="button" id="btnMulti" class="btn" value="Multiplayer" onclick="initGame(4)"></br>
+			</div>
+			<div id="player-picker">
+			</div>
+			<div id="game-window">
+				<div id="side-panel">
+					<input type="button" id="btnHide" class="btn" value="Hide" onclick="hideScrollbar()"></br>
+					<div id="scrollbar">
+					</div>
+				</div>
+				<div id="table-area">
+					<div class="button-panel">
+						<input type="button" id="hitButton" class="btn" value="hit" onclick="hit()"></>
+						<input type="button" id="passButton" class="btn" value="pass" onclick="pass()"></>
+					</div>
+					<div class="info-panel">
+					
+					</div>
+					<div class="player" id="plr">
+						<div class="player-num" id="plrNum">Player 1</div>
+						</br>
+						<div class="player-points" id="plrPts">0</div>
+						</br>
+						<div class="card-area" id="crdArea"><div>
+					</div>
+				</div>
+			</div>		
+		</div>
+	</body>
 </html>

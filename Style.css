@@ -4,3 +4,93 @@ body{
 	background-attachment: fixed;
 	background-size: cover;
 }
+
+.btn{
+    border: 2px solid #45c457;
+	margin-top: 10px;
+    padding: 10px 30px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.btn:hover{
+	border: 2px solid white;
+    background:#45c457;
+	transition-duration: 0.3s;
+}
+
+#main-window{
+	width: 100%;
+	text-align:center;
+	min-height: 500px;
+}
+
+#start-window{
+	display: block;
+}
+
+#game-window{
+	display: none;
+}
+
+#side-panel{
+	width: 25%;
+	float: left;
+	text-align: center;
+	margin-left: 5%;
+}
+
+#scrollbar{
+	width: 80%;
+	overflow: auto;
+    border: solid 5px #45c457;
+    border-radius: 10px;
+    padding: 20px;
+    display: inline-block;
+    margin:1%;
+    vertical-align: top;
+    background:#f5f5f5;
+	height: 400px;
+}
+
+#table-area{
+	width: 65%;
+	float: left;
+	text-align: center;
+	display: inline-block;
+	
+}
+
+.scrollbar-element{
+	width: 80%;
+}
+
+.scrollbar-cards{
+	width: 50%;
+
+}
+
+.player{
+    width: 70%;
+    border: solid 5px #45c457;
+    border-radius: 10px;
+    padding: 20px;
+    display: inline-block;
+    margin:1%;
+    vertical-align: top;
+    background:#f5f5f5;
+}
+
+.card-area{
+	
+}
+
+.cardImg{
+	width: 50%;
+	float: left;
+}
+
+.button-panel{
+	width: 100%;
+	text-align: center;
+}
