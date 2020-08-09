@@ -9,25 +9,41 @@
 		<div id="main-window">
 			<h3>Blackjack</h3>
 			<div id="start-window">
-				<input type="button" id="btnSingle" class="btn" value="Single player" onclick="initGame(1)"></br>
-				<input type="button" id="btnMulti" class="btn" value="Multiplayer" onclick="initGame(4)"></br>
+				<input type="button" id="btnSingle" class="btn" value="Single player" onclick="initGame()"></br>
+				<input type="button" id="btnMulti" class="btn" value="Multiplayer" onclick="initMultiplayer()"></br>
 			</div>
-			<div id="player-picker">
+			<div id="multiplayer-window" class="hidden-window">
+				Number of players
+				</br>
+				<input type="button" id="decPlayers" class="btn" value="-" onclick="decPlayers()"></>
+				<span id="playerCount">2</span>
+				<input type="button" id="incPlayers" class="btn" value="+" onclick="incPlayers()"></>
+				</br>
+				<input type="button" id="start" class="btn" value="Start" onclick="initGame()"></>
+				<input type="button" id="back" class="btn" value="Back" onclick="backToMenu()"></>
 			</div>
-			<div id="game-window">
+			<div id="game-window" class="hidden-window">
+				<div id="info-panel" class="hidden-window">
+					<div id="info-text"></div>
+					<div class="button-panel">
+						<input type="button" id="playAgain" class="btn" value="Play again" onclick="playAgain()"></>
+						<input type="button" id="backToMenu" class="btn" value="Back to menu" onclick="backToMenu()"></>
+					</div>
+				</div>
 				<div id="side-panel">
+					Game history
+					</br>
 					<input type="button" id="btnHide" class="btn" value="Hide" onclick="hideScrollbar()"></br>
 					<div id="scrollbar">
 					</div>
 				</div>
+
 				<div id="table-area">
 					<div class="button-panel">
 						<input type="button" id="hitButton" class="btn" value="hit" onclick="hit()"></>
 						<input type="button" id="passButton" class="btn" value="pass" onclick="pass()"></>
 					</div>
-					<div class="info-panel">
-					
-					</div>
+
 					<div class="player" id="plr">
 						<div class="player-num" id="plrNum">Player 1</div>
 						</br>

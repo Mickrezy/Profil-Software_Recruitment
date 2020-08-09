@@ -1,13 +1,31 @@
 const gameState = {
+	playerCount: 1,
 	deckID: null,
 	players: [],
-	isSinglePlayer: false,
-	isGameInitializing: false,
-	isGameActive: false,
-	isGameOver: false,
 	activePlayer: null,
 	initialCards: null,
 };
+
+const initGame = () => {
+  showGameUI();
+  for (i = 0; i < gameState.playerCount; i++){
+    gameState.players.push({
+      Cards: [],
+      Points: 0, 
+      isPlaying: true
+    });
+  }
+  if(gameState.playerCount == 1){
+	gameState.players.push({
+      Cards: [],
+      Points: 0, 
+      isPlaying: true
+    });
+  }
+  initDeck().then(() => {
+    startGame();
+  });
+}
 
 const getData = url => fetch(url).then(res => res.json()).catch(err => err);
 
@@ -18,36 +36,23 @@ const initDeck = () => {
 	});
 }
 
-const initGame = playerCount => {
-  gameState.Initializing = true;
-  showTable();
-  for (i = 0; i < playerCount; i++){
-    gameState.players.push({
-      Cards: [],
-      Points: 0, 
-      Alive: true
-    });
-  }
-  if(playerCount == 1){
-	gameState.isSinglePlayer = true;
-	gameState.players.push({
-      Cards: [],
-      Points: 0, 
-      Alive: true
-    });
-  }
-  initDeck().then(() => {
-    gameState.isGameInitializing = false;
-    gameState.isGameActive= true;
-	gameState.isGameInitialized = false;
-    startGame();
-  });
-}
-
 const startGame = () => {
   gameState.activePlayer = 0;
   gameState.initialCards = 2;
   newTurn();
+}
+
+const newTurn = () =>{
+	initHand().then(() => {		
+		changePlayerUI();	
+		if(gameState.players[gameState.activePlayer].Points == 22 || (gameState.playerCount == 1 && gameState.players[1].Points > gameState.players[0].Points)){
+			gameOver();
+		}
+		else if(gameState.playerCount == 1 && gameState.activePlayer == 1 && gameState.players[1].Points < 20){
+			disablePlayerButtons();
+			setTimeout(hit, 1000);
+		}
+	});				
 }
 
 const initHand = () => {
@@ -71,33 +76,19 @@ const returnCardValue = card => {
 	else return parseInt(card);
 }
 
-const newTurn = () =>{
-	initHand().then(() => {		
-		updatePlayerUI();	
-		if(gameState.players[gameState.activePlayer].Points == 22 || (gameState.isSinglePlayer && gameState.players[1].Points > gameState.players[0].Points)){
-			gameOver();
-		}
-		else if(gameState.isSinglePlayer && gameState.activePlayer == 1 && gameState.players[1].Points < 20){
-			setTimeout(hit, 1500);
-		}
-	});				
-}
-
 const hit = () =>{
 	getCard(1).then(cards => {
 		gameState.players[gameState.activePlayer].Points += returnCardValue(cards[0].value);
 		gameState.players[gameState.activePlayer].Cards.push(cards[0]);	
 		updatePoints();			
-		showCard(gameState.players[gameState.activePlayer].Cards.length - 1);	
-		
+		showCard(gameState.players[gameState.activePlayer].Cards.length - 1);			
 		if(gameState.players[gameState.activePlayer].Points > 21){
-			gameState.players[gameState.activePlayer].Alive = false;
+			gameState.players[gameState.activePlayer].isPlaying = false;
 			pass();
-		}
-		
-		else if (gameState.isSinglePlayer && gameState.activePlayer == 1){
+		}		
+		else if (gameState.playerCount == 1 && gameState.activePlayer == 1){
 			if(gameState.players[0].Points >= gameState.players[1].Points && gameState.players[1].Points < 20){
-				setTimeout(hit, 1500);
+				setTimeout(hit, 1000);
 			}
 			else pass();
 		}
@@ -105,7 +96,7 @@ const hit = () =>{
 }
 
 const pass = () => {
-	if(gameState.activePlayer < gameState.players.length - 1 && !(gameState.isSinglePlayer && gameState.players[0].Alive == false)){
+	if(gameState.activePlayer < gameState.players.length - 1 && !(gameState.playerCount == 1 && gameState.players[0].isPlaying == false)){
 		gameState.activePlayer += 1;
 		newTurn();
 	}
@@ -113,67 +104,86 @@ const pass = () => {
 }
 
 const gameOver = () => {
-	gameState.isGameOver = true;
-	document.getElementById("hitButton").disabled = true;
-	document.getElementById("passButton").disabled = true;
+	disablePlayerButtons();
+	document.getElementById("info-panel").style.display = "block";
 	let winners = [];
 	let bestScore = 0;
 	for(i = 0; i < gameState.players.length; i++){
-		if (gameState.players[i].Alive == true){
+		if (gameState.players[i].isPlaying == true){
 			if(gameState.players[i].Points > bestScore){
 				winners = [];
-				winners.push(i);
+				winners.push(i + 1);
 				bestScore = gameState.players[i].Points;
 			}
 			else if (gameState.players[i].Points == bestScore){
-				winners.push(i);
+				winners.push(i + 1);
 			}
 		}			
 	}
 	let msg = "";
-	for(i = 0; i < winners.length; i++){
-		msg += "Player " + winners[i] + " ";
+	if(winners.length == 1) msg = "Winner: Player " + winners[0];
+	else{
+		msg = "Winners: Players ";
+		for(i = 0; i < winners.length; i++){
+			msg += winners[i];
+			if (i <	winners.length - 1) msg	+= ", ";
+		}		
 	}
-	msg += "won!"
-	console.log(msg);
-	//todo: window for scores and "play again" function
+	document.getElementById("info-text").innerHTML = msg;
 }
 
-const restartGame = () =>{
-	//game reset
-	gameState.deckID = null;
-	gameState.players = [];
-	gameState.isGameInitializing = false;
-	gameState.isGameInitialized = false;
-	gameState.isSinglePlayer = false;
-	gameState.activePlayer = 0;
-	gameState.initialCards = 2;
-}
-
-const updatePlayerUI = () => {
+const changePlayerUI = () => {
 	document.getElementById("plrNum").innerHTML = "Player " + (gameState.activePlayer + 1);
-	const cards = document.getElementById("crdArea");
-	cards.innerHTML = "";
+	document.getElementById("crdArea").innerHTML = "";
 	if(gameState.activePlayer > 0){
 		moveToScrollbar();
 	}
-	setTimeout(showCard(0), 1500);
-	updatePoints();
-	setTimeout(showCard(1), 1500);
-	updatePoints();
-		
+	showCard(0);
+	showCard(1)
+	updatePoints();		
 }
 
 const updatePoints = () => {
 	document.getElementById("plrPts").innerHTML = gameState.players[gameState.activePlayer].Points;
 }
 
-const showCard = (index) => {
-	const cardArea = document.getElementById("crdArea");  	
+const showCard = (index) => {	
 	let card = document.createElement("img");	
 	card.className = "cardImg";
 	card.src = gameState.players[gameState.activePlayer].Cards[index].image;
-	cardArea.appendChild(card);		
+	document.getElementById("crdArea").appendChild(card);		
+}
+
+const showGameUI = () => {
+	document.getElementById("game-window").style.display = "block";
+	document.getElementById("start-window").style.display = "none";
+	document.getElementById("multiplayer-window").style.display = "none";
+}
+
+const initMultiplayer = () =>{
+	gameState.playerCount = 2;
+	document.getElementById("playerCount").innerHTML = gameState.playerCount;
+	document.getElementById("start-window").style.display = "none";
+	document.getElementById("multiplayer-window").style.display = "block";	
+}
+
+const disablePlayerButtons = () =>{
+	document.getElementById("hitButton").disabled = true;
+	document.getElementById("passButton").disabled = true;
+}
+
+const incPlayers = () =>{
+	gameState.playerCount++;
+	document.getElementById("playerCount").innerHTML = gameState.playerCount;
+	if(gameState.playerCount == 8)	document.getElementById("incPlayers").disabled = true;
+	else if(gameState.playerCount == 3) document.getElementById("decPlayers").disabled = false;	
+}
+
+const decPlayers = () =>{
+	gameState.playerCount--;
+	document.getElementById("playerCount").innerHTML = gameState.playerCount;
+	if(gameState.playerCount == 2)	document.getElementById("decPlayers").disabled = true;
+	else if(gameState.playerCount == 7) document.getElementById("incPlayers").disabled = false;	
 }
 
 const moveToScrollbar = () => {
@@ -191,27 +201,41 @@ const moveToScrollbar = () => {
 		card.src = gameState.players[gameState.activePlayer-1].Cards[i].image;
 		cards.appendChild(card);
 	}
-	cards.innerHtml += "</br>";
-	
-}
-
-
-const showTable = () => {
-	const table = document.getElementById("game-window");
-	const menu = document.getElementById("start-window");
-	menu.style.display = "none";
-	table.style.display = "block";
 }
 
 const hideScrollbar = () => {
 	const scrl = document.getElementById("scrollbar");
-	const btn = document.getElementById("btnHide");
 	if (scrl.style.display === "none"){
 		scrl.style.display = "inline-block";
-		btn.value = "Hide";
+		document.getElementById("btnHide").value = "Hide";
 	}
 	else{
 		scrl.style.display = "none";
-		btn.value = "Show";
+		document.getElementById("btnHide").value = "Show";
 	}
+}
+
+const backToMenu = () =>{
+	//location.reload();
+	restartGame();
+	gameState.playerCount = 1;
+	document.getElementById("start-window").style.display = "block";
+	document.getElementById("game-window").style.display = "none";	
+	document.getElementById("multiplayer-window").style.display = "none";
+}
+
+const playAgain = () => {
+	restartGame();
+	initGame(gameState.playerCount);
+}
+
+const restartGame = () =>{
+	gameState.deckID = null;
+	gameState.players = [];
+	gameState.activePlayer = 0;
+	gameState.initialCards = 2;	
+	document.getElementById("scrollbar").innerHTML = "";
+	document.getElementById("hitButton").disabled = false;
+	document.getElementById("passButton").disabled = false;
+	document.getElementById("info-panel").style.display = "none";	
 }
