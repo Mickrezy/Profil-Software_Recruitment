@@ -7,7 +7,7 @@ body{
 
 button{
 	border: 2px solid #45c457;	
-    padding: 10px 20px;
+    padding: 1.5% 5%;
     border-radius:4px;
 	margin-top: 3%;
 	margin-left: 3%;
@@ -23,34 +23,28 @@ button:hover {
 }
 
 .btn{	
-	font-size: 22px;
-	height: 50px;
-	width: 90px;
+	font-size: 1.8vw;
+	margin-bottom: 3%;
 }
 
 .wideBtn{
-	font-size: 22px;
-	height: 50px;
-	width: 6;
+	padding: 1% 4%;
+	font-size: 1.8vw;
 }
 
 .smallBtn{
+	padding: 1% 1%;
+	font-size: 1.0vw;
 	font-family: 'Arial';
-	font-size: 15px;
-	height: 50px;
-	width: 50px;
 }
 
 .mediumBtn{
-	font-size: 25px;
-	height: 90px;
-	width: 180px;
+	padding: 1% 3%;
+	font-size: 2.5vw;
 }
 
-.bigBtn{
-	font-size: 32px;
-	height: 120px;
-	width: 200px;	
+.bigBtn{	
+	font-size: 3.0vw;
 }
 
 
@@ -62,13 +56,13 @@ button:hover {
 
 .title-font{
 	font-family: 'Condiment';
-	font-size: 24px;
+	font-size: 2.6vw;
 }
 
 #game-title{
 	margin-top: 7%;
 	margin-bottom: 7%;
-	font-size: 42px;
+	font-size: 4.0vw;
 }
 
 .bottom-buttons{
@@ -79,13 +73,13 @@ button:hover {
 
 #info-text{
 	margin-top: 3%;
-	font-size: 30px;
+	font-size: 3.0vw;
 }
 
 #player-num-title{
 	margin-top: 4%;
 	margin-bottom: 2%;
-	font-size: 30px;
+	font-size: 3.0vw;
 }
 
 #start-window{
@@ -106,20 +100,21 @@ button:hover {
 	width: 25%;
 	float: left;
 	text-align: center;
-	margin-left: 5%;
+	margin-left: 3%;
+}
+
+.hide-scrollbar {
+    overflow: hidden;
 }
 
 #scrollbar{
 	width: 80%;
+	max-height: 35.0vw;
 	overflow: auto;
-    border: solid 5px #45c457;
-    border-radius: 10px;
-    padding: 20px;
+	margin-right: -100px;
+    padding-right: 100px;
     display: inline-block;
-    margin:4%;
     vertical-align: top;
-    background:#f5f5f5;
-	height: 400px;
 }
 
 
@@ -132,7 +127,7 @@ button:hover {
 }
 
 .scrollbar-element{
-	width: 80%;
+	width: 60%;
 }
 
 .scrollbar-cards{
@@ -144,12 +139,14 @@ button:hover {
 .player{
     width: 90%;
     border: solid 5px #45c457;
-    border-radius: 10px;
-    padding: 20px;
+    border-radius: 5%;
+    padding: 4%;
     display: inline-block;
     margin:1%;
+	text-align: center;
     vertical-align: top;
-    background:#f5f5f5;
+    background-color:rgba(0,255,0,0.1);
+
 }
 
 .cardImg{
