@@ -4,27 +4,28 @@ const gameState = {
 	players: [],
 	activePlayer: null,
 	initialCards: null,
+	alivePlayers: null,
 };
 
 const initGame = () => {
   showGameUI();
-  for (i = 0; i < gameState.playerCount; i++){
+  //singleplayer always has playerCount = 1
+  if(gameState.playerCount == 1) addPlayers(2);
+  else addPlayers(gameState.playerCount);
+  initDeck().then(() => {
+    startGame();
+  });
+}
+
+const addPlayers = count =>{
+  for (i = 0; i < count; i++){
     gameState.players.push({
       Cards: [],
       Points: 0, 
       isPlaying: true
     });
   }
-  if(gameState.playerCount == 1){
-	gameState.players.push({
-      Cards: [],
-      Points: 0, 
-      isPlaying: true
-    });
-  }
-  initDeck().then(() => {
-    startGame();
-  });
+  gameState.alivePlayers = count;
 }
 
 const getData = url => fetch(url).then(res => res.json()).catch(err => err);
@@ -38,20 +39,26 @@ const initDeck = () => {
 
 const startGame = () => {
   gameState.activePlayer = 0;
+  //with this parameter we can manipulate initial amount of cards player gets
   gameState.initialCards = 2;
   newTurn();
 }
 
 const newTurn = () =>{
-	initHand().then(() => {		
-		changePlayerUI();	
+	//disable buttons so players can't spam "pass" before they actually get their turn
+	disablePlayerButtons(true);
+	initHand().then(() => {	
+		changePlayerUI();				
+	}).then(()=>{
+		//game ends automatically when player has 2 aces in his initial hand or when bots has more points in its initial hand
 		if(gameState.players[gameState.activePlayer].Points == 22 || (gameState.playerCount == 1 && gameState.players[1].Points > gameState.players[0].Points)){
 			gameOver();
 		}
 		else if(gameState.playerCount == 1 && gameState.activePlayer == 1 && gameState.players[1].Points < 20){
-			disablePlayerButtons();
 			setTimeout(hit, 1000);
 		}
+		//if there is next human player - enable buttons back
+		else disablePlayerButtons(false);
 	});				
 }
 
@@ -69,10 +76,10 @@ const getCard = cardNum => {
 }
 
 const returnCardValue = card => {
-	if (card=="ACE") return 11;
-	else if (card=="JACK" || card=="2") return 2;
-	else if (card=="QUEEN" || card=="3") return 3;
-	else if (card=="KING" || card=="4") return 4;
+	if (card=='ACE') return 11;
+	else if (card=='JACK' || card=='2') return 2;
+	else if (card=='QUEEN' || card=='3') return 3;
+	else if (card=='KING' || card=='4') return 4;
 	else return parseInt(card);
 }
 
@@ -83,36 +90,45 @@ const hit = () =>{
 		updatePoints();			
 		showCard(gameState.players[gameState.activePlayer].Cards.length - 1);			
 		if(gameState.players[gameState.activePlayer].Points > 21){
-			document.getElementById("game-over-panel").style.display = "block";
-			document.getElementById("game-over-text").innerHTML = "Player " + (gameState.activePlayer + 1) + " lost";
-			gameState.players[gameState.activePlayer].isPlaying = false;
-			gamePass();
+			playerLost();
 		}		
 		else if (gameState.playerCount == 1 && gameState.activePlayer == 1){
 			if(gameState.players[0].Points >= gameState.players[1].Points && gameState.players[1].Points < 20){
+				//timeout so bot doesn't get all cards at once
 				setTimeout(hit, 1000);
 			}
-			else gamePass();
+			else gameOver();
 		}
 	});
 }
 
-const pass = () =>{
-	document.getElementById("game-over-panel").style.display = "none";
+const playerLost = () =>{
+	document.getElementById('game-over-panel').style.display = 'block';
+	document.getElementById('game-over-text').innerHTML = 'Player ' + (gameState.activePlayer + 1) + ' lost';
+	gameState.players[gameState.activePlayer].isPlaying = false;
+	gameState.alivePlayers -= 1;
 	gamePass();
 }
 
-const gamePass = () => {	
-	if(gameState.activePlayer < gameState.players.length - 1 && !(gameState.playerCount == 1 && gameState.players[0].isPlaying == false)){
+const pass = () =>{
+	document.getElementById('game-over-panel').style.display = 'none';
+	gamePass();
+}
+
+const gamePass = () => {
+	//game ends when all the players made their turn or all players before the last one lost	
+	if(gameState.activePlayer < gameState.players.length - 1 && gameState.alivePlayers > 1){
 		gameState.activePlayer += 1;
 		newTurn();
+	}	
+	else{ 
+		disablePlayerButtons(true)
+		gameOver();
 	}
-	else gameOver();
 }
 
 const gameOver = () => {
-	disablePlayerButtons();
-	document.getElementById("info-panel").style.display = "block";
+	document.getElementById('info-panel').style.display = 'block';
 	let winners = [];
 	let bestScore = 0;
 	for(i = 0; i < gameState.players.length; i++){
@@ -123,126 +139,134 @@ const gameOver = () => {
 				bestScore = gameState.players[i].Points;
 			}
 			else if (gameState.players[i].Points == bestScore){
+				//in case of draws
 				winners.push(i + 1);
 			}
 		}			
 	}
-	let msg = "";
-	if(winners.length == 1) msg = "Winner: Player " + winners[0];
+	let msg = '';
+	if(winners.length == 1) msg = 'Winner: Player ' + winners[0];
 	else{
-		msg = "Winners: Players ";
+		msg = 'Winners: Players ';
 		for(i = 0; i < winners.length; i++){
 			msg += winners[i];
-			if (i <	winners.length - 1) msg	+= ", ";
+			if (i <	winners.length - 1) msg	+= ', ';
 		}		
 	}
-	document.getElementById("info-text").innerHTML = msg;
+	document.getElementById('info-text').innerHTML = msg;
 }
 
+//UI set for next player
 const changePlayerUI = () => {
-	document.getElementById("plrNum").innerHTML = "Player " + (gameState.activePlayer + 1);
-	document.getElementById("crdArea").innerHTML = "";
+	document.getElementById('plrNum').innerHTML = 'Player ' + (gameState.activePlayer + 1);
+	document.getElementById('crdArea').innerHTML = '';
 	if(gameState.activePlayer > 0){
 		moveToScrollbar();
 	}
-	showCard(0);
-	showCard(1)
+	for(i = 0; i < gameState.initialCards; i++){
+		showCard(i);
+	}
 	updatePoints();		
 }
 
 const updatePoints = () => {
-	document.getElementById("plrPts").innerHTML = "Points: " + gameState.players[gameState.activePlayer].Points;
+	document.getElementById('plrPts').innerHTML = 'Points: ' + gameState.players[gameState.activePlayer].Points;
 }
 
 const showCard = (index) => {	
-	let card = document.createElement("img");	
-	card.className = "cardImg";
+	let card = document.createElement('img');	
+	card.className = 'cardImg';
 	card.src = gameState.players[gameState.activePlayer].Cards[index].image;
-	document.getElementById("crdArea").appendChild(card);		
+	document.getElementById('crdArea').appendChild(card);		
 }
 
 const showGameUI = () => {
-	document.getElementById("game-window").style.display = "block";
-	document.getElementById("start-window").style.display = "none";
-	document.getElementById("multiplayer-window").style.display = "none";
+	document.getElementById('game-window').style.display = 'block';
+	document.getElementById('start-window').style.display = 'none';
+	document.getElementById('multiplayer-window').style.display = 'none';
 }
 
 const initMultiplayer = () =>{
 	gameState.playerCount = 2;
-	document.getElementById("playerCount").innerHTML = gameState.playerCount;
-	document.getElementById("start-window").style.display = "none";
-	document.getElementById("multiplayer-window").style.display = "block";	
+	document.getElementById('playerCount').innerHTML = gameState.playerCount;
+	document.getElementById('start-window').style.display = 'none';
+	document.getElementById('multiplayer-window').style.display = 'block';	
 }
 
-const disablePlayerButtons = () =>{
-	document.getElementById("hitButton").disabled = true;
-	document.getElementById("passButton").disabled = true;
+//disable or enable pass and hit buttons during bot turn or when the game is over
+const disablePlayerButtons = disable =>{
+	document.getElementById('hitButton').disabled = disable;
+	document.getElementById('passButton').disabled = disable;
 }
 
 const incPlayers = () =>{
 	gameState.playerCount++;
-	document.getElementById("playerCount").innerHTML = gameState.playerCount;
-	if(gameState.playerCount == 8)	document.getElementById("incPlayers").disabled = true;
-	else if(gameState.playerCount == 3) document.getElementById("decPlayers").disabled = false;	
+	document.getElementById('playerCount').innerHTML = gameState.playerCount;
+	//technically max number of players for 1 deck is 10, but I set it to 8 so the game is not too predictable in the end
+	if(gameState.playerCount == 8)	document.getElementById('incPlayers').disabled = true;
+	else if(gameState.playerCount == 3) document.getElementById('decPlayers').disabled = false;	
 }
 
 const decPlayers = () =>{
 	gameState.playerCount--;
-	document.getElementById("playerCount").innerHTML = gameState.playerCount;
-	if(gameState.playerCount == 2)	document.getElementById("decPlayers").disabled = true;
-	else if(gameState.playerCount == 7) document.getElementById("incPlayers").disabled = false;	
+	document.getElementById('playerCount').innerHTML = gameState.playerCount;
+	if(gameState.playerCount == 2)	document.getElementById('decPlayers').disabled = true;
+	else if(gameState.playerCount == 7) document.getElementById('incPlayers').disabled = false;	
 }
 
+//move active player's cards to scrollbar
 const moveToScrollbar = () => {
-	const scrollbar = document.getElementById("scrollbar");
-	let playerInfo = document.createElement("div");
-	let cards = document.createElement("div");
-	playerInfo.className = "scrollbarElement";
-	cards.className = "scrollbarElement";
+	const scrollbar = document.getElementById('scrollbar');
+	let playerInfo = document.createElement('div');
+	let cards = document.createElement('div');
+	playerInfo.className = 'scrollbarElement';
+	cards.className = 'scrollbarElement';
 	scrollbar.appendChild(playerInfo);
 	scrollbar.appendChild(cards);
-	playerInfo.innerHTML = "Player " + gameState.activePlayer + " points: " + gameState.players[gameState.activePlayer - 1].Points;
+	playerInfo.innerHTML = 'Player ' + gameState.activePlayer + ' points: ' + gameState.players[gameState.activePlayer - 1].Points;
 	for(i = 0; i < gameState.players[gameState.activePlayer - 1].Cards.length; i++){
-		let card = document.createElement("img");
-		card.className = "scrollbar-cards";
+		let card = document.createElement('img');
+		card.className = 'scrollbar-cards';
 		card.src = gameState.players[gameState.activePlayer-1].Cards[i].image;
 		cards.appendChild(card);
 	}
 }
 
 const hideScrollbar = () => {
-	const scrl = document.getElementById("scrollbar");
-	if (scrl.style.display === "none"){
-		scrl.style.display = "inline-block";
-		document.getElementById("btnHide").innerHTML = "Hide";
+	const scrl = document.getElementById('scrollbar');
+	if (scrl.style.display === 'none'){
+		scrl.style.display = 'inline-block';
+		document.getElementById('btnHide').innerHTML = 'Hide';
 	}
 	else{
-		scrl.style.display = "none";
-		document.getElementById("btnHide").innerHTML = "Show";
+		scrl.style.display = 'none';
+		document.getElementById('btnHide').innerHTML = 'Show';
 	}
 }
 
 const backToMenu = () =>{
 	restartGame();
 	gameState.playerCount = 1;
-	document.getElementById("start-window").style.display = "block";
-	document.getElementById("game-window").style.display = "none";	
-	document.getElementById("multiplayer-window").style.display = "none";
+	document.getElementById('start-window').style.display = 'block';
+	document.getElementById('game-window').style.display = 'none';	
+	document.getElementById('multiplayer-window').style.display = 'none';
 }
 
+//play the game with the same amount of players
 const playAgain = () => {
 	restartGame();
 	initGame(gameState.playerCount);
 }
 
+//reset game to its original state
 const restartGame = () =>{
 	gameState.deckID = null;
 	gameState.players = [];
-	gameState.activePlayer = 0;
-	gameState.initialCards = 2;	
-	document.getElementById("scrollbar").innerHTML = "";
-	document.getElementById("hitButton").disabled = false;
-	document.getElementById("passButton").disabled = false;
-	document.getElementById("info-panel").style.display = "none";	
-	document.getElementById("game-over-panel").style.display = "none";
+	document.getElementById('scrollbar').innerHTML = '';
+	document.getElementById('crdArea').innerHTML = '';
+	document.getElementById('plrNum').innerHTML = 'Player 1';
+	document.getElementById('plrPts').innerHTML = 'Points: 0'
+	disablePlayerButtons(false);
+	document.getElementById('info-panel').style.display = 'none';	
+	document.getElementById('game-over-panel').style.display = 'none';
 }
