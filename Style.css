@@ -5,19 +5,54 @@ body{
 	background-size: cover;
 }
 
-.btn{
-    border: 2px solid #45c457;
-	margin-top: 10px;
-    padding: 10px 30px;
-    border-radius:8px;
+button{
+	border: 2px solid #45c457;	
+    padding: 10px 20px;
+    border-radius:4px;
+	margin-top: 3%;
+	margin-left: 3%;
+	margin-right: 3%;
     cursor:pointer;
+	font-family: 'Condiment';
 }
 
-.btn:hover{
+button:hover {
 	border: 2px solid white;
     background:#45c457;
 	transition-duration: 0.3s;
 }
+
+.btn{	
+	font-size: 22px;
+	height: 50px;
+	width: 90px;
+}
+
+.wideBtn{
+	font-size: 22px;
+	height: 50px;
+	width: 6;
+}
+
+.smallBtn{
+	font-family: 'Arial';
+	font-size: 15px;
+	height: 50px;
+	width: 50px;
+}
+
+.mediumBtn{
+	font-size: 25px;
+	height: 90px;
+	width: 180px;
+}
+
+.bigBtn{
+	font-size: 32px;
+	height: 120px;
+	width: 200px;	
+}
+
 
 #main-window{
 	width: 100%;
@@ -25,15 +60,47 @@ body{
 	min-height: 500px;
 }
 
+.title-font{
+	font-family: 'Condiment';
+	font-size: 24px;
+}
+
+#game-title{
+	margin-top: 7%;
+	margin-bottom: 7%;
+	font-size: 42px;
+}
+
+.bottom-buttons{
+	margin-top: 2%;
+	text-align: center;
+	margin-bottom: 2%;
+}
+
+#info-text{
+	margin-top: 3%;
+	font-size: 30px;
+}
+
+#player-num-title{
+	margin-top: 4%;
+	margin-bottom: 2%;
+	font-size: 30px;
+}
+
 #start-window{
 	display: block;
+}
+
+#playerCount{
+	margin-left: 2%;
+	margin-right: 2%;
 }
 
 .hidden-window{
 	text-align: center;
 	display: none;	
 }
-
 
 #side-panel{
 	width: 25%;
@@ -49,7 +116,7 @@ body{
     border-radius: 10px;
     padding: 20px;
     display: inline-block;
-    margin:1%;
+    margin:4%;
     vertical-align: top;
     background:#f5f5f5;
 	height: 400px;
@@ -57,7 +124,7 @@ body{
 
 
 #table-area{
-	width: 65%;
+	width: 70%;
 	float: left;
 	text-align: center;
 	display: inline-block;
@@ -69,11 +136,13 @@ body{
 }
 
 .scrollbar-cards{
-	width: 50%;
+	width: 46%;
+	margin-left: 2%;
+	margin-right: 2%;
 }
 
 .player{
-    width: 70%;
+    width: 90%;
     border: solid 5px #45c457;
     border-radius: 10px;
     padding: 20px;
@@ -84,8 +153,10 @@ body{
 }
 
 .cardImg{
-	width: 50%;
+	width: 31%;
 	float: left;
+	margin-left: 2%;
+	margin-top: 2%;
 }
 
 .button-panel{

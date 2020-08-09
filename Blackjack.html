@@ -3,51 +3,60 @@
 	<head>
 		<meta charset="UTF-8">
 		<link rel="stylesheet" href="Style.css">
+		<link href='https://fonts.googleapis.com/css?family=Condiment' rel='stylesheet'>
 		<script src="Script.js"></script> 
 	</head>
 	<body>
-		<div id="main-window">
-			<h3>Blackjack</h3>
+		<div id="main-window">		
 			<div id="start-window">
-				<input type="button" id="btnSingle" class="btn" value="Single player" onclick="initGame()"></br>
-				<input type="button" id="btnMulti" class="btn" value="Multiplayer" onclick="initMultiplayer()"></br>
+				<div class="title-font" id="game-title"><font color ="black">Black</font><font color="red">jack</font></div>
+				<div class="bottom-buttons">
+					<button type="button" id="btnSingle" class="bigBtn" onclick="initGame()">Single player</button>
+					<button type="button" id="btnMulti" class="bigBtn" onclick="initMultiplayer()">Multiplayer</button>
+				</div>
 			</div>
 			<div id="multiplayer-window" class="hidden-window">
-				Number of players
-				</br>
-				<input type="button" id="decPlayers" class="btn" value="-" onclick="decPlayers()"></>
-				<span id="playerCount">2</span>
-				<input type="button" id="incPlayers" class="btn" value="+" onclick="incPlayers()"></>
-				</br>
-				<input type="button" id="start" class="btn" value="Start" onclick="initGame()"></>
-				<input type="button" id="back" class="btn" value="Back" onclick="backToMenu()"></>
+				<div>
+					<div class="title-font" id="player-num-title">
+						<font color ="black">Number</font><font color="red"> of </font><font color ="black"> players</font>
+					</div>
+					<div>
+						<button type="button" id="decPlayers" class="smallBtn" onclick="decPlayers()">-</button>
+						<span class="title-font" id="playerCount">2</span>
+						<button type="button" id="incPlayers" class="smallBtn" onclick="incPlayers()">+</button>
+					</div>
+					<div class="bottom-buttons">
+						<button type="button" id="start" class="mediumBtn" onclick="initGame()">Start</button>
+						<button type="button" id="back" class="mediumBtn" onclick="backToMenu()">Back</button>
+					</div>
+				</div>
 			</div>
 			<div id="game-window" class="hidden-window">
 				<div id="info-panel" class="hidden-window">
-					<div id="info-text"></div>
-					<div class="button-panel">
-						<input type="button" id="playAgain" class="btn" value="Play again" onclick="playAgain()"></>
-						<input type="button" id="backToMenu" class="btn" value="Back to menu" onclick="backToMenu()"></>
+					<div class="title-font" id="info-text"></div>
+					<div class="bottom-buttons">
+						<button type="button" id="playAgain" class="wideBtn" onclick="playAgain()">Play again</button>
+						<button type="button" id="backToMenu" class="wideBtn" onclick="backToMenu()">Back to menu</button>
 					</div>
 				</div>
 				<div id="side-panel">
+					<div class="title-font" style="font-size: 34px">
 					Game history
-					</br>
-					<input type="button" id="btnHide" class="btn" value="Hide" onclick="hideScrollbar()"></br>
-					<div id="scrollbar">
+					</div>
+					<button type="button" id="btnHide" class="btn" onclick="hideScrollbar()">Hide</button></br>
+					<div id="scrollbar" class="title-font">
 					</div>
 				</div>
 
 				<div id="table-area">
 					<div class="button-panel">
-						<input type="button" id="hitButton" class="btn" value="hit" onclick="hit()"></>
-						<input type="button" id="passButton" class="btn" value="pass" onclick="pass()"></>
+						<button type="button" id="hitButton" class="btn" onclick="hit()">Hit</button></>
+						<button type="button" id="passButton" class="btn" onclick="pass()">Pass</button></>
 					</div>
 
 					<div class="player" id="plr">
-						<div class="player-num" id="plrNum">Player 1</div>
-						</br>
-						<div class="player-points" id="plrPts">0</div>
+						<div class="title-font" id="plrNum">Player 1</div>						
+						<div class="title-font" id="plrPts">Points: 0</div>
 						</br>
 						<div class="card-area" id="crdArea"><div>
 					</div>

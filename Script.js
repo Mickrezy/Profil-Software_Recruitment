@@ -144,7 +144,7 @@ const changePlayerUI = () => {
 }
 
 const updatePoints = () => {
-	document.getElementById("plrPts").innerHTML = gameState.players[gameState.activePlayer].Points;
+	document.getElementById("plrPts").innerHTML = "Points: " + gameState.players[gameState.activePlayer].Points;
 }
 
 const showCard = (index) => {	
@@ -207,16 +207,15 @@ const hideScrollbar = () => {
 	const scrl = document.getElementById("scrollbar");
 	if (scrl.style.display === "none"){
 		scrl.style.display = "inline-block";
-		document.getElementById("btnHide").value = "Hide";
+		document.getElementById("btnHide").innerHTML = "Hide";
 	}
 	else{
 		scrl.style.display = "none";
-		document.getElementById("btnHide").value = "Show";
+		document.getElementById("btnHide").innerHTML = "Show";
 	}
 }
 
 const backToMenu = () =>{
-	//location.reload();
 	restartGame();
 	gameState.playerCount = 1;
 	document.getElementById("start-window").style.display = "block";
