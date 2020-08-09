@@ -9,7 +9,7 @@
 	<body>
 		<div id="main-window">		
 			<div id="start-window">
-				<div class="title-font" id="game-title"><font color ="black">Black</font><font color="red">jack</font></div>
+				<div class="title-font" id="game-title"><span class="black-span">Black</span><span class="red-span">jack</span></div>
 				<div class="bottom-buttons">
 					<button type="button" id="btnSingle" class="bigBtn" onclick="initGame()">Single player</button>
 					<button type="button" id="btnMulti" class="bigBtn" onclick="initMultiplayer()">Multiplayer</button>
@@ -18,7 +18,7 @@
 			<div id="multiplayer-window" class="hidden-window">
 				<div>
 					<div class="title-font" id="player-num-title">
-						<font color ="black">Number</font><font color="red"> of </font><font color ="black"> players</font>
+						<span class="black-span">Number</span><span class="red-span"> of </span><span class="black-span"> players</span>
 					</div>
 					<div>
 						<button type="button" id="decPlayers" class="smallBtn" onclick="decPlayers()">-</button>
@@ -43,7 +43,7 @@
 					</div>
 				</div>
 				<div id="side-panel">
-					<div class="title-font" style="font-size: 3.0vw">
+					<div class="title-font">
 					Game history
 					</div>
 					<button type="button" id="btnHide" class="btn" onclick="hideScrollbar()">Hide</button></br>

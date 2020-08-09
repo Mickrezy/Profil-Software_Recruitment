@@ -95,6 +95,13 @@ button:hover {
 	margin-right: 2%;
 }
 
+.red-span{
+	color: red;
+}
+.black-span{
+	color: black;
+}
+
 .hidden-window{
 	text-align: center;
 	display: none;	
