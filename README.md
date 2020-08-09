@@ -1,37 +1,48 @@
-## Welcome to GitHub Pages
+# Profil Software Intern Task - frontend
 
-You can use the [editor on GitHub](https://github.com/Mickrezy/Profil-Software_Recruitment/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+## Technologies
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+* JavaScript
+* HTML
+* CSS
 
-### Markdown
+## Setup
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Put all the files in the same directory, then open Blackjack.html file. Make sure to enable JavaScript in the browser.
+Internet connection is required.
 
-```markdown
-Syntax highlighted code block
+## Game rules 
 
-# Header 1
-## Header 2
-### Header 3
+The game is a Polish variant of blackjack. The first player initially gets two cards, then they can hit (get another one) untill they decide to stop or lose.
+They can also pass the turn to the next player, who then gets their card and repeats the process of passing and hitting.
+Game ends on one of 3 conditions:
+- when all players made their turn
+- when one of the players got 2 Aces in their initial hand
+- when all the players except the last one lost
 
-- Bulleted
-- List
+Player loses when their hand has more than 21 points (except for 2 Aces). The card scores:
+- Jack, Queen, King and Ace are worth 2, 3, 4 and 11 points
+- other cards are worth the same amount of points as their printed value
 
-1. Numbered
-2. List
+When the game ends, all the players who didn't lose compare their points. The ones closest to 21 points win the game.
 
-**Bold** and _Italic_ and `Code` text
+## Usage
 
-[Link](url) and ![Image](src)
-```
+Initially UI alows the user to chose between two game modes: single player and multiplayer.
+After clicking on single player button, UI changes and user starts a game with a bot. 
+When choosing multiplayer, user can pick a number between 2 and 8, and then start a game with that many players, or go back to main page.
+Technically up to 10 people can play with one deck, but then the game becomes too predictable in the end.
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+Game UI has 2 main areas: table, where the player sees their cards and points, and sidebar, where logs from previous rounds are kept.
+Above the table there are 2 button: hit and pass. When player presses hit, they get a new card. 
+If pass is pressed, if there are more players, the next player's turn begins. Otherwise, the game ends and the winners are shown above.
+When a player loses after hit, the turn is passed to the next player (if possible), and a notification appears above the table area.
 
-### Jekyll Themes
+Sidebar shows cards and points of previous players. The list is scrollable, and it can be hidden with a button.
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Mickrezy/Profil-Software_Recruitment/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+After the game ends, user can choose 2 options: to play the game once again, with the same amount of players and a new deck,
+or to go back to main menu.
 
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+Bot has a very simple goal: to win at any cost. It will always hit when it has less points than the player, except when
+it has 20 points, since that situation is impossible to win. 
+If bot has more points in its initial hand than the player, it automatically wins.
