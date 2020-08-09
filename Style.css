@@ -86,6 +86,10 @@ button:hover {
 	display: block;
 }
 
+#game-over-panel{
+	margin-top: 3%;
+}
+
 #playerCount{
 	margin-left: 2%;
 	margin-right: 2%;

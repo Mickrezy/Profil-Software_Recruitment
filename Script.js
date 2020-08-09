@@ -83,19 +83,26 @@ const hit = () =>{
 		updatePoints();			
 		showCard(gameState.players[gameState.activePlayer].Cards.length - 1);			
 		if(gameState.players[gameState.activePlayer].Points > 21){
+			document.getElementById("game-over-panel").style.display = "block";
+			document.getElementById("game-over-text").innerHTML = "Player " + (gameState.activePlayer + 1) + " lost";
 			gameState.players[gameState.activePlayer].isPlaying = false;
-			pass();
+			gamePass();
 		}		
 		else if (gameState.playerCount == 1 && gameState.activePlayer == 1){
 			if(gameState.players[0].Points >= gameState.players[1].Points && gameState.players[1].Points < 20){
 				setTimeout(hit, 1000);
 			}
-			else pass();
+			else gamePass();
 		}
 	});
 }
 
-const pass = () => {
+const pass = () =>{
+	document.getElementById("game-over-panel").style.display = "none";
+	gamePass();
+}
+
+const gamePass = () => {	
 	if(gameState.activePlayer < gameState.players.length - 1 && !(gameState.playerCount == 1 && gameState.players[0].isPlaying == false)){
 		gameState.activePlayer += 1;
 		newTurn();
@@ -237,4 +244,5 @@ const restartGame = () =>{
 	document.getElementById("hitButton").disabled = false;
 	document.getElementById("passButton").disabled = false;
 	document.getElementById("info-panel").style.display = "none";	
+	document.getElementById("game-over-panel").style.display = "none";
 }
